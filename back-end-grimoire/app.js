@@ -1,8 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const Book = require('./models/Book');
-const User = require("./models/User")
+import 'dotenv/config';
+import express from 'express';
+import mongoose from 'mongoose';
+import Book from './models/Book.js';
+import User from './models/User.js';
+
 const app = express();
 
 mongoose.connect(process.env.MONGO_URI)
@@ -59,4 +60,4 @@ app.post('/api/auth/signup', (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 })
 
-module.exports = app;
+export default app;
