@@ -1,21 +1,21 @@
-import http from 'http';
+import http from 'http'; // module natif de node pour le serv http
 import app from './app.js';
 
-const normalizePort = val => {
+const normalizePort = val => { // converti le port en nombre
     const port = parseInt(val, 10);
 
     if (isNaN(port)) {
-        return val;
+        return val; // si c'est pas un chiffre on garde la valeur
     }
     if (port >= 0) {
         return port;
     }
     return false;
 };
-const port = normalizePort(process.env.PORT || '4000');
+const port = normalizePort(process.env.PORT || '4000'); // port 4000 par defaut
 app.set('port', port);
 
-const errorHandler = error => {
+const errorHandler = error => { // gere les erreurs au demarage du serv
     if (error.syscall !== 'listen') {
         throw error;
     }
@@ -35,13 +35,13 @@ const errorHandler = error => {
     }
 };
 
-const server = http.createServer(app);
+const server = http.createServer(app); // creation du serv http avec express
 
 server.on('error', errorHandler);
-server.on('listening', () => {
+server.on('listening', () => { // qd le serv ecoute on log le port
     const address = server.address();
     const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
     console.log('Listening on ' + bind);
 });
 
-server.listen(port);
+server.listen(port); // demarre l'ecoute
