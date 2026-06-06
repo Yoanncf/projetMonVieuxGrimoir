@@ -3,8 +3,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Book from './models/Book.js';
 import userRoutes from './routes/user.js';
-import bookRoutes from './routes/book.js'
+import bookRoutes from './routes/book.js';
 const app = express();
+
+
 
 // connexion a la base mongo
 mongoose.connect(process.env.MONGO_URI)
@@ -22,6 +24,7 @@ app.use((req, res, next) => {
 
 app.use(express.json()); // lit le json envoyer par le front
 
+app.use('/images', express.static('images'));
 app.use('/api/auth', userRoutes); // toutes les routes auth vont dans routes/user.js
 app.use('/api/books', bookRoutes);
 

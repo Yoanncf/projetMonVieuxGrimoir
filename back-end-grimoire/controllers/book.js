@@ -2,8 +2,60 @@ import Book from "../models/Book.js";
 import { optimizeImage } from "../utils/sharp.js";
 
 
+//Récuperer les livres 
+export const getAllBook = (req, res) => {
+    Book.find()
+        .then(books => res.status(200).json(books))
+        .catch(error => res.status(400).json({ error }));
+}
+
+//Récuperer un livre
+export const getOneBook = async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id });
+        if (!book) {
+            return res.status(404).json({ message: "Livre non trouvé" });
+        }
+        res.status(200).json(book);
+    } catch (error) {
+        console.error("Echec de la récupération du livre", error)
+        res.status(500).json({ error })
+    }
+}
+
+//ajouter un note
+export const addRating = async (req, res) => {
+
+}
+
+//Notation 
+export const getBookRatings = async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id });
+        if (!book) {
+            return res.status(404).json({ message: "Livre non trouvé" });
+        }
+        res.status(200).json(book.ratings);
+    } catch (error) {
+        console.error("Echec de la récupération du livre", error)
+        res.status(500).json({ error })
+    }
+}
+
+//Meilleurs notes
+export const getBestRatings = async (req, res) => {
+    try {
+        const books = await Book.find().sort({ averageRating: -1 }).limit(3);
+        res.status(200).json(books);
+
+    } catch (error) {
+        console.error("Echec de la récupération des 3 meilleurs notes", error)
+        res.status(500).json({ error })
+    }
+}
+
 //Créé un book 
-const createBook = async (req, res) => {
+export const createBook = async (req, res) => {
     try {
         const bookObject = JSON.parse(req.body.book);
         const fieldName = await optimizeImage(req.file);
@@ -13,7 +65,6 @@ const createBook = async (req, res) => {
             ...bookObject, userId: req.auth.userId,
             imageUrl: `${req.protocol}://${req.get("host")}/${fieldName}`
         });
-        console.log("image", book);
         await book.save();
         res.status(201).json({ message: "Livre enregistré !" });
     } catch (error) {
@@ -22,4 +73,3 @@ const createBook = async (req, res) => {
     }
 }
 
-export default { createBook };
