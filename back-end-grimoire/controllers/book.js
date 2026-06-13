@@ -23,9 +23,36 @@ export const getOneBook = async (req, res) => {
     }
 }
 
+const alreadyRated = (userId, ratings) => {
+    return ratings.some((rating) => rating.userId == userId);
+}
+
+const calculateAverageRating = (book, ratingObject) => {
+    const ratings = [...book.ratings, ratingObject];
+    const totalGrade = ratings.reduce((acc, rating) => acc + rating.grade, 0);
+    //On multipli par 10 pour n'avoir qu'une seul décimal (pour 2 par 100)
+    return Math.round((totalGrade / ratings.length) * 10) / 10;
+}
+
 //ajouter un note
 export const addRating = async (req, res) => {
-
+    try {
+        const ratingObject = { ...req.body, grade: req.body.rating };
+        delete ratingObject.rating;
+        const book = await Book.findOne({ _id: req.params.id });
+        if (!book) return res.status(404).json({ message: "Livre non trouvé" });
+        if (alreadyRated(req.body.userId, book.ratings)) {
+            return res.status(403).json({ message: "Vous avez déjà noté ce livre" });
+        }
+        const averageRating = calculateAverageRating(book, ratingObject);
+        //On ajoute avec l'opérateur mongo db $push l'élément ratingObject au tableau de note rating et on met à jour la moyenne
+        await Book.updateOne({ _id: req.params.id }, { $push: { ratings: ratingObject }, averageRating });
+        const updatedBook = await Book.findOne({ _id: req.params.id });
+        res.status(200).json(updatedBook);
+    } catch (error) {
+        console.error("Echec d'ajout de note", error)
+        res.status(500).json({ error: error.message });
+    }
 }
 
 //Notation 
@@ -84,7 +111,6 @@ export const updateBook = async (req, res) => {
         if (book.userId !== req.auth.userId) {
             return res.status(403).json({ message: "Requête non autorisée" });
         }
-
         // Si nouvelle image
         let bookObject;
         if (req.file) {
@@ -97,7 +123,6 @@ export const updateBook = async (req, res) => {
             bookObject = { ...req.body };
         }
         delete bookObject._userId;
-
         await Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id });
         res.status(200).json({ message: "Livre modifié !" });
     } catch (error) {
