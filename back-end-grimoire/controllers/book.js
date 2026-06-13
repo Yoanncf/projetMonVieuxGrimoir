@@ -73,3 +73,35 @@ export const createBook = async (req, res) => {
     }
 }
 
+//Modifier un livre
+export const updateBook = async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id });
+        if (!book) {
+            return res.status(404).json({ message: "Livre non trouvé" });
+        }
+        // seul le proprio peut modifier
+        if (book.userId !== req.auth.userId) {
+            return res.status(403).json({ message: "Requête non autorisée" });
+        }
+
+        // Si nouvelle image
+        let bookObject;
+        if (req.file) {
+            const fieldName = await optimizeImage(req.file);
+            bookObject = {
+                ...JSON.parse(req.body.book),
+                imageUrl: `${req.protocol}://${req.get("host")}/${fieldName}`,
+            };
+        } else {
+            bookObject = { ...req.body };
+        }
+        delete bookObject._userId;
+
+        await Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id });
+        res.status(200).json({ message: "Livre modifié !" });
+    } catch (error) {
+        console.error("Echec de modification du livre", error);
+        res.status(400).json({ error });
+    }
+}
