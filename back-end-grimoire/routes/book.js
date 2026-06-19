@@ -14,8 +14,7 @@ router.post("/:id/rating", auth, addRating);
 router.get("/bestrating", getBestRatings);
 router.get("/:id", getOneBook);
 router.get("/", getAllBook);
-//Pas demandé mais on a créé la route
-router.get("/:id/ratings", getBookRatings);
+
 // multer car possible nouvelle image
 router.put("/:id", auth, multer, updateBook);
 
