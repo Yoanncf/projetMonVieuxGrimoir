@@ -1,5 +1,7 @@
 import Book from "../models/Book.js";
 import { optimizeImage } from "../utils/sharp.js";
+import fs from "fs";
+
 
 
 //Récuperer les livres 
@@ -130,3 +132,26 @@ export const updateBook = async (req, res) => {
         res.status(400).json({ error });
     }
 }
+
+//Supprimer un livre 
+export const deleteBook = async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id });
+        if (!book) {
+            return res.status(404).json({ message: "Livre non trouvé" });
+        }
+        if (book.userId !== req.auth.userId) {
+            return res.status(403).json({ message: "Requete non autorisée" });
+        }
+        //Suppression de l'image 
+        // récupère le nom du fichier depuis l'URL
+        const filename = book.imageUrl.split('/images/')[1];
+        // efface le fichier du disque
+        await fs.promises.unlink(`images/${filename}`);
+        await Book.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: "Livre supprimé !" });
+    } catch (error) {
+        console.error("Echec de la suppression du livre", error);
+        res.status(400).json({ error });
+    }
+};

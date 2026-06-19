@@ -1,5 +1,5 @@
 import multer from "../middleware/multer-config.js";
-import { createBook, getAllBook, getOneBook, getBookRatings, getBestRatings, updateBook, addRating } from '../controllers/book.js';
+import { createBook, getAllBook, getOneBook, getBookRatings, getBestRatings, updateBook, addRating, deleteBook } from '../controllers/book.js';
 import express from "express";
 import auth from "../middleware/auth.js";
 
@@ -19,5 +19,6 @@ router.get("/:id/ratings", getBookRatings);
 // multer car possible nouvelle image
 router.put("/:id", auth, multer, updateBook);
 
+router.delete("/:id", auth, deleteBook);
 
 export default router;
