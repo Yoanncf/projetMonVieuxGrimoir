@@ -39,6 +39,10 @@ const calculateAverageRating = (book, ratingObject) => {
 //ajouter un note
 export const addRating = async (req, res) => {
     try {
+        // la note doit être comprise entre 0 et 5 
+        if (req.body.rating < 0 || req.body.rating > 5) {
+            return res.status(400).json({ message: "La note doit être comprise entre 0 et 5" });
+        }
         const ratingObject = { ...req.body, grade: req.body.rating };
         delete ratingObject.rating;
         const book = await Book.findOne({ _id: req.params.id });
