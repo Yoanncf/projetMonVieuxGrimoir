@@ -5,7 +5,9 @@ Elle fournir les données au front-end React fourni, dans le dossier front-end-g
 
 Lancement
 
-Le fichier .env est fourni avec le livrable  placez-le dans back-end-grimoire/.
+Il faut créer un fichier .env à la racine du projet  back-end-grimoire.
+Dans le .env il faut renseigner ces variables : MONGO_URI (dans DATABASE -> Clusters -> connect -> Drivers -> partie 3)  et JWT_SECRET 
+
 
 
 cd back-end-grimoire
